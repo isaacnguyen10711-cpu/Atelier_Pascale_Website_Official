@@ -31,8 +31,7 @@ function ProductPage() {
       setProducts([])
 
       try {
-
-        const response = await fetch(`${API_URL}/api/products/category/${categoryName}?sortBy=${sortBy}`);
+        let response = await fetch(`${API_URL}/api/products/category/${categoryName}?sortBy=${sortBy}`);
 
         if (!response.ok) {
           // If the response is not ok, wait for 5 seconds and try again
