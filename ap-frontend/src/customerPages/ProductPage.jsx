@@ -29,20 +29,33 @@ function ProductPage() {
   useEffect(() => {
     async function loadProducts() {
       setProducts([])
-      const response = await fetch(`${API_URL}/api/products/category/${categoryName}?sortBy=${sortBy}`);
 
-      if (!response.ok) {
-        console.error('Failed to fetch products:', response.statusText);
-        return;
+      try {
+
+        const response = await fetch(`${API_URL}/api/products/category/${categoryName}?sortBy=${sortBy}`);
+
+        if (!response.ok) {
+          // If the response is not ok, wait for 5 seconds and try again
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          response = await fetch(`${API_URL}/api/products/category/${categoryName}?sortBy=${sortBy}`);
+        }
+
+        // Throw an error if the response is still not ok after retrying
+        if (!response.ok) {
+          throw new Error(`Fetching error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setProducts(data);
+        setIsLoading(false);
       }
-
-      const data = await response.json();
-      setProducts(data);
-      setIsLoading(false);
+      catch (error) {
+        console.error(error);
+      }
     }
 
     loadProducts();
-  }, [categoryName, sortBy]);
+    }, [categoryName, sortBy]);
 
   function handleSort(e) {
     const value = e.target.value
