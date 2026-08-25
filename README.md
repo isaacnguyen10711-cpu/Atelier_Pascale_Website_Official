@@ -8,7 +8,7 @@ The project was inspired by my family's business, which traditionally relied on 
 
 [View Atelier Pascale](https://www.atelierpascaleboutique.com/)
 
-###If the products stays in "loading products..." for too long, refresh the page since the cloud server might not be ready yet
+### If the products stays in "loading products..." for too long, refresh the page since the cloud server might not be ready yet
 
 ## Testing customer login account
 - email: example.test@gmail.com
