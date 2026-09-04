@@ -3,6 +3,7 @@ using AtelierPascaleWebsite.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using AtelierPascaleWebsite.Services;
+using AtelierPascaleWebsite.Services.Interfaces;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -71,6 +72,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<EmailSender>();
+builder.Services.AddScoped<IProductService, ProductsService>();
 
 builder.Services.AddRateLimiter(options =>
 {
