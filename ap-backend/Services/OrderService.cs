@@ -21,10 +21,15 @@ namespace AtelierPascaleWebsite.Services
             int userId,
             bool isAdmin)
         {
+
+
             var ordersQuery = _context.Orders
                 .Include(order => order.OrderItems)
-                .ThenInclude(item => item.Product)
-                .ThenInclude(product => product!.Images)
+                    .ThenInclude(item => item.Product)
+                        .ThenInclude(product => product!.Category)
+                .Include(order => order.OrderItems)
+                    .ThenInclude(item => item.Product)
+                        .ThenInclude(product => product!.Images)
                 .AsQueryable();
 
             if (!isAdmin)
@@ -71,8 +76,11 @@ namespace AtelierPascaleWebsite.Services
         {
             var order = await _context.Orders
                 .Include(order => order.OrderItems)
-                .ThenInclude(item => item.Product)
-                .ThenInclude(product => product!.Images)
+                    .ThenInclude(item => item.Product)
+                        .ThenInclude(product => product!.Category)
+                .Include(order => order.OrderItems)
+                    .ThenInclude(item => item.Product)
+                        .ThenInclude(product => product!.Images)
                 .FirstOrDefaultAsync(order => order.Id == id);
 
             if (order == null)
