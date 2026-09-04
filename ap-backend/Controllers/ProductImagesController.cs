@@ -1,143 +1,93 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using AtelierPascaleWebsite.Models;
 using AtelierPascaleWebsite.Models.DTOs;
-using AtelierPascaleWebsite.Data;
+using AtelierPascaleWebsite.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
 [Route("api/[controller]")]
 [ApiController]
 public class ProductImagesController : ControllerBase
 {
-    private readonly DatabaseContext _context;
-    public ProductImagesController(DatabaseContext context)
+    private readonly IProductImageService _productImageService;
+
+    public ProductImagesController(IProductImageService productImageService)
     {
-        _context = context;
+        _productImageService = productImageService;
     }
 
-    // GET: api/ProductImage
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProductImageDTO>>> GetProductImage()
     {
-        return await _context.ProductImages
-            .Select(pi => new ProductImageDTO
-            {
-                Id = pi.Id,
-                ProductId = pi.ProductId,
-                ImageUrl = pi.ImageUrl
-            })
-            .ToListAsync();
+        var productImages = await _productImageService.GetAllProductImages();
+        return Ok(productImages);
     }
 
-    // GET: api/ProductImage/5
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductImageDTO>> GetProductImage(int id)
     {
-        var productimage = await _context.ProductImages.FindAsync(id);
+        var productImage = await _productImageService.GetProductImageById(id);
 
-        if (productimage == null)
+        if (productImage == null)
         {
             return NotFound();
         }
 
-        return new ProductImageDTO
-        {
-            Id = productimage.Id,
-            ProductId = productimage.ProductId,
-            ImageUrl = productimage.ImageUrl
-        };
+        return Ok(productImage);
     }
 
-    // PUT: api/ProductImage/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [Authorize(Roles = "Admin")]
     [EnableRateLimiting("Fixed")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutProductImage(int? id, ProductImageDTO productimage)
+    public async Task<IActionResult> PutProductImage(int id, ProductImageDTO productImage)
     {
-        if (id != productimage.Id)
+        if (id != productImage.Id)
         {
             return BadRequest();
         }
 
-        var existingProductImage = await _context.ProductImages.FindAsync(id);
-        if (existingProductImage == null) {
+        var updatedProductImage = await _productImageService
+            .UpdateProductImage(id, productImage);
+
+        if (updatedProductImage == null)
+        {
             return NotFound();
-        }
-
-        existingProductImage.ProductId = productimage.ProductId;
-        existingProductImage.ImageUrl = productimage.ImageUrl;
-
-        _context.Entry(existingProductImage).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!ProductImageExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
         }
 
         return NoContent();
     }
 
-    // POST: api/ProductImage
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [Authorize(Roles = "Admin")]
     [EnableRateLimiting("Fixed")]
     [HttpPost]
-    public async Task<ActionResult<ProductImageDTO>> PostProductImage(ProductImageDTO productimage)
+    public async Task<ActionResult<ProductImageDTO>> PostProductImage(
+        ProductImageDTO productImage)
     {
+        var createdProductImage = await _productImageService
+            .CreateProductImage(productImage);
 
-        var productExists = await _context.Products.AnyAsync(p => p.Id == productimage.ProductId);
-        if (!productExists)
+        if (createdProductImage == null)
         {
             return NotFound();
         }
 
-        var newProductImage = new ProductImage
-        {
-            ProductId = productimage.ProductId,
-            ImageUrl = productimage.ImageUrl
-        };
-
-        _context.ProductImages.Add(newProductImage);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction("GetProductImage", new { id = newProductImage.Id }, newProductImage);
+        return CreatedAtAction(
+            nameof(GetProductImage),
+            new { id = createdProductImage.Id },
+            createdProductImage);
     }
 
-    // DELETE: api/ProductImage/5
     [Authorize(Roles = "Admin")]
     [EnableRateLimiting("Fixed")]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProductImage(int? id)
+    public async Task<IActionResult> DeleteProductImage(int id)
     {
-        var productimage = await _context.ProductImages.FindAsync(id);
-        if (productimage == null)
+        var deleted = await _productImageService.DeleteProductImage(id);
+
+        if (!deleted)
         {
             return NotFound();
         }
 
-        _context.ProductImages.Remove(productimage);
-        await _context.SaveChangesAsync();
-
         return NoContent();
     }
-
-    private bool ProductImageExists(int? id)
-    {
-        return _context.ProductImages.Any(e => e.Id == id);
-    }
 }
-
-
