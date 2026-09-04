@@ -30,7 +30,18 @@ namespace AtelierPascaleWebsite.Services
         public async Task<ProductImageDTO?> GetProductImageById(int id)
         {
             var productImage = await _context.ProductImages.FindAsync(id);
-            return productImage == null ? null : ToResponseDTO(productImage);
+            if (productImage == null)
+            {
+                return null;
+            }
+
+
+            return new ProductImageDTO
+            {
+                Id = productImage.Id,
+                ProductId = productImage.ProductId,
+                ImageUrl = productImage.ImageUrl
+            };
         }
 
         public async Task<ProductImageDTO?> CreateProductImage(ProductImageDTO productImage)
@@ -52,7 +63,12 @@ namespace AtelierPascaleWebsite.Services
             _context.ProductImages.Add(newProductImage);
             await _context.SaveChangesAsync();
 
-            return ToResponseDTO(newProductImage);
+            return new ProductImageDTO
+            {
+                Id = newProductImage.Id,
+                ProductId = newProductImage.ProductId,
+                ImageUrl = newProductImage.ImageUrl
+            };
         }
 
         public async Task<ProductImageDTO?> UpdateProductImage(
@@ -83,7 +99,12 @@ namespace AtelierPascaleWebsite.Services
                 throw;
             }
 
-            return ToResponseDTO(existingProductImage);
+            return new ProductImageDTO
+            {
+                Id = existingProductImage.Id,
+                ProductId = existingProductImage.ProductId,
+                ImageUrl = existingProductImage.ImageUrl
+            };
         }
 
         public async Task<bool> DeleteProductImage(int id)
@@ -98,16 +119,6 @@ namespace AtelierPascaleWebsite.Services
             _context.ProductImages.Remove(productImage);
             await _context.SaveChangesAsync();
             return true;
-        }
-
-        private static ProductImageDTO ToResponseDTO(ProductImage productImage)
-        {
-            return new ProductImageDTO
-            {
-                Id = productImage.Id,
-                ProductId = productImage.ProductId,
-                ImageUrl = productImage.ImageUrl
-            };
         }
 
         private Task<bool> ProductImageExists(int id)

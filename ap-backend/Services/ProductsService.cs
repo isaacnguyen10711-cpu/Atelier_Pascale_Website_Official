@@ -21,7 +21,26 @@ namespace AtelierPascaleWebsite.Services
                 .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
-            return product == null ? null : ToResponseDTO(product);
+            if (product == null)
+            {
+                return null;
+            }
+
+            return new ProductResponseDTO
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                CategoryId = product.CategoryId,
+                IsNewArrival = product.IsNewArrival,
+                Images = product.Images.Select(i => new ProductImageDTO
+                {
+                    Id = i.Id,
+                    ProductId = i.ProductId,
+                    ImageUrl = i.ImageUrl
+                }).ToList()
+            };
         }
 
         public async Task<IEnumerable<ProductResponseDTO>> GetProductsByCategory(
@@ -60,7 +79,21 @@ namespace AtelierPascaleWebsite.Services
             productsQuery = sortedQuery;
 
             var products = await productsQuery.ToListAsync();
-            return products.Select(ToResponseDTO);
+            return products.Select(product => new ProductResponseDTO
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                CategoryId = product.CategoryId,
+                IsNewArrival = product.IsNewArrival,
+                Images = product.Images.Select(i => new ProductImageDTO
+                {
+                    Id = i.Id,
+                    ProductId = i.ProductId,
+                    ImageUrl = i.ImageUrl
+                }).ToList()
+            });
         }
 
         public async Task<ProductResponseDTO?> CreateProduct(
@@ -86,7 +119,21 @@ namespace AtelierPascaleWebsite.Services
             _context.Products.Add(newProduct);
             await _context.SaveChangesAsync();
 
-            return ToResponseDTO(newProduct);
+            return new ProductResponseDTO
+            {
+                Id = newProduct.Id,
+                Name = newProduct.Name,
+                Description = newProduct.Description,
+                Price = newProduct.Price,
+                CategoryId = newProduct.CategoryId,
+                IsNewArrival = newProduct.IsNewArrival,
+                Images = newProduct.Images.Select(i => new ProductImageDTO
+                {
+                    Id = i.Id,
+                    ProductId = i.ProductId,
+                    ImageUrl = i.ImageUrl
+                }).ToList()
+            };
         }
 
         public async Task<ProductResponseDTO?> UpdateProduct(
@@ -130,7 +177,21 @@ namespace AtelierPascaleWebsite.Services
                 throw;
             }
 
-            return ToResponseDTO(existingProduct);
+            return new ProductResponseDTO
+            {
+                Id = existingProduct.Id,
+                Name = existingProduct.Name,
+                Description = existingProduct.Description,
+                Price = existingProduct.Price,
+                CategoryId = existingProduct.CategoryId,
+                IsNewArrival = existingProduct.IsNewArrival,
+                Images = existingProduct.Images.Select(i => new ProductImageDTO
+                {
+                    Id = i.Id,
+                    ProductId = i.ProductId,
+                    ImageUrl = i.ImageUrl
+                }).ToList()
+            };
         }
 
         public async Task<bool> DeleteProduct(int id)
@@ -145,25 +206,6 @@ namespace AtelierPascaleWebsite.Services
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return true;
-        }
-
-        private static ProductResponseDTO ToResponseDTO(Product product)
-        {
-            return new ProductResponseDTO
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                CategoryId = product.CategoryId,
-                IsNewArrival = product.IsNewArrival,
-                Images = product.Images.Select(i => new ProductImageDTO
-                {
-                    Id = i.Id,
-                    ProductId = i.ProductId,
-                    ImageUrl = i.ImageUrl
-                }).ToList()
-            };
         }
 
         private Task<bool> ProductExists(int id)
