@@ -65,7 +65,7 @@ namespace AtelierPascaleWebsite.Services
                     ImageUrl = item.Product.Images
                         .Select(image => image.ImageUrl)
                         .FirstOrDefault() ?? string.Empty
-                }).ToList()
+                }).ToList() 
             }).ToList();
         }
 

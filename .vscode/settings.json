@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "ap-backend\\bin\\Release\\net10.0\\publish",
+    "appService.defaultWebAppToDeploy": "/subscriptions/9e9b8961-62c6-4f8b-9e62-58026c1e37d3/resourceGroups/AtelierPascale/providers/Microsoft.Web/sites/atelierpascale"
+}
