@@ -59,7 +59,8 @@ function MyOrdersPage() {
   }
 
   function navigateToProduct(categoryName, productId) {
-    navigate(`/products/${categoryName}/${productId}`)
+    const formattedCategoryName = categoryName.toLowerCase().replaceAll(' ', '-')
+    navigate(`/products/${formattedCategoryName}/${productId}`)
   }
 
   if (isLoading) {
