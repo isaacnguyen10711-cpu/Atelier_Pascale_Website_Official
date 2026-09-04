@@ -4,8 +4,6 @@ namespace AtelierPascaleWebsite.Services.Interfaces
 {
     public interface IProductService
     {
-        Task<IEnumerable<ProductResponseDTO>> GetAllProducts(string? sortBy);
-
         Task<ProductResponseDTO?> GetProductById(int id);
 
         Task<IEnumerable<ProductResponseDTO>> GetProductsByCategory(string categoryName, string? sortBy);
