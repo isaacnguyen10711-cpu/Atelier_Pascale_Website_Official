@@ -74,6 +74,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<IProductService, ProductsService>();
 builder.Services.AddScoped<IProductImageService, ProductImageService>();
+builder.Services.AddScoped<IItemsInCartService, ItemsInCartService>();
 
 builder.Services.AddRateLimiter(options =>
 {
